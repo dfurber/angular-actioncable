@@ -1,5 +1,7 @@
-/*@ngInject;*/
-const ActionCableController = function($rootScope, ActionCableConfig) {
+angular.module('ngActionCable')
+  .factory('ActionCableController', ['$rootScope', 'ActionCableConfig', ActionCableController]);
+
+function ActionCableController($rootScope, ActionCableConfig) {
 
   // add a hash of callbacks here that `route_channel` will call on an incoming message.
   // actions format: actions[channelName][dataParams] = [callback1, callback2, ...]
@@ -86,5 +88,3 @@ const ActionCableController = function($rootScope, ActionCableConfig) {
 
   return methods;
 }
-
-export default ActionCableController;

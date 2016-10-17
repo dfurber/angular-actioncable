@@ -1,4 +1,4 @@
-const ActionCableConfig = function() {
+angular.module('ngActionCable').factory('ActionCableConfig', function() {
   var defaultWsUri= 'wss://please.add.an.actioncable.meta.tag.invalid:12345/path/to/cable';
   var _wsUri;
   var config= {
@@ -12,7 +12,7 @@ const ActionCableConfig = function() {
       return _wsUri;
     },
     set: function(newWsUri) {
-      devlog(`Setting new wsUri! ${newWsUri}`);
+      // devlog(`Setting new wsUri! ${newWsUri}`);
       _wsUri= newWsUri;
       return _wsUri;
     }
@@ -21,6 +21,4 @@ const ActionCableConfig = function() {
   function actioncable_meta_tag_content() {
     return _wsUri;
   }
-};
-
-export default ActionCableConfig;
+});

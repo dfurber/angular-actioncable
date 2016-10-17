@@ -1,5 +1,4 @@
-/*@ngInject;*/
-const ActionCableWebsocket = function($websocket, ActionCableController, ActionCableConfig) {
+angular.module('ngActionCable').factory("ActionCableWebsocket", ['$websocket', 'ActionCableController', 'ActionCableConfig', function($websocket, ActionCableController, ActionCableConfig) {
   var controller = ActionCableController;
   var dataStream = null;
   var methods;
@@ -81,6 +80,4 @@ const ActionCableWebsocket = function($websocket, ActionCableController, ActionC
     }
   };
   return methods;
-};
-
-export default ActionCableWebsocket;
+}]);
