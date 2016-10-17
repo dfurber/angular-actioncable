@@ -1,4 +1,4 @@
-angular.module('ngActionCable', ['ngWebSocket']).factory('ActionCableSocketWrangler', ['$rootScope', 'ActionCableWebsocket', 'ActionCableConfig', 'ActionCableController',
+angular.module('ngActionCable').factory('ActionCableSocketWrangler', ['$rootScope', 'ActionCableWebsocket', 'ActionCableConfig', 'ActionCableController',
 function($rootScope, ActionCableWebsocket, ActionCableConfig, ActionCableController) {
   var reconnectIntervalTime= 7537;
   var timeoutTime= 20143;
@@ -86,5 +86,3 @@ function($rootScope, ActionCableWebsocket, ActionCableConfig, ActionCableControl
   if (ActionCableConfig.autoStart) methods.start();
   return methods;
 }]);
-
-ActionCableSocketWrangler
