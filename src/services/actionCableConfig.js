@@ -1,4 +1,4 @@
-angular.module('ngActionCable').factory('ActionCableConfig', function() {
+ngActionCable.factory('ActionCableConfig', function() {
   var defaultWsUri= 'wss://please.add.an.actioncable.meta.tag.invalid:12345/path/to/cable';
   var _wsUri;
   var config= {

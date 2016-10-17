@@ -1,4 +1,4 @@
-angular.module('ngActionCable').factory("ActionCableWebsocket", ['$websocket', 'ActionCableController', 'ActionCableConfig', function($websocket, ActionCableController, ActionCableConfig) {
+ngActionCable.factory("ActionCableWebsocket", ['$websocket', 'ActionCableController', 'ActionCableConfig', function($websocket, ActionCableController, ActionCableConfig) {
   var controller = ActionCableController;
   var dataStream = null;
   var methods;

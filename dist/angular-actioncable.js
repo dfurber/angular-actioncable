@@ -1,7 +1,8 @@
-angular.module('ngActionCable', ['ngWebsocket']);
+'use strict';
 
-angular.module('ngActionCable')
-  .factory('ActionCableChannel', ['$q', '$rootScope', 'ActionCableController', 'ActionCableWebsocket', 'ActionCableConfig', 'ActionCableSocketWrangler', ActionCableChannel]);
+var ngActionCable = angular.module('ngActionCable', ['ngWebsocket']);
+
+ngActionCable.factory('ActionCableChannel', ['$q', '$rootScope', 'ActionCableController', 'ActionCableWebsocket', 'ActionCableConfig', 'ActionCableSocketWrangler', ActionCableChannel]);
 
 function ActionCableChannel($q, $rootScope, ActionCableController, ActionCableWebsocket, ActionCableConfig, ActionCableSocketWrangler){
   return function(channelName, channelParams){
@@ -83,7 +84,7 @@ function ActionCableChannel($q, $rootScope, ActionCableController, ActionCableWe
   };
 }
 
-angular.module('ngActionCable').factory('ActionCableConfig', function() {
+ngActionCable.factory('ActionCableConfig', function() {
   var defaultWsUri= 'wss://please.add.an.actioncable.meta.tag.invalid:12345/path/to/cable';
   var _wsUri;
   var config= {
@@ -108,8 +109,7 @@ angular.module('ngActionCable').factory('ActionCableConfig', function() {
   }
 });
 
-angular.module('ngActionCable')
-  .factory('ActionCableController', ['$rootScope', 'ActionCableConfig', ActionCableController]);
+ngActionCable.factory('ActionCableController', ['$rootScope', 'ActionCableConfig', ActionCableController]);
 
 function ActionCableController($rootScope, ActionCableConfig) {
 
@@ -199,7 +199,7 @@ function ActionCableController($rootScope, ActionCableConfig) {
   return methods;
 }
 
-angular.module('ngActionCable').factory('ActionCableSocketWrangler', ['$rootScope', 'ActionCableWebsocket', 'ActionCableConfig', 'ActionCableController',
+ngActionCable.factory('ActionCableSocketWrangler', ['$rootScope', 'ActionCableWebsocket', 'ActionCableConfig', 'ActionCableController',
 function($rootScope, ActionCableWebsocket, ActionCableConfig, ActionCableController) {
   var reconnectIntervalTime= 7537;
   var timeoutTime= 20143;
@@ -288,7 +288,7 @@ function($rootScope, ActionCableWebsocket, ActionCableConfig, ActionCableControl
   return methods;
 }]);
 
-angular.module('ngActionCable').factory("ActionCableWebsocket", ['$websocket', 'ActionCableController', 'ActionCableConfig', function($websocket, ActionCableController, ActionCableConfig) {
+ngActionCable.factory("ActionCableWebsocket", ['$websocket', 'ActionCableController', 'ActionCableConfig', function($websocket, ActionCableController, ActionCableConfig) {
   var controller = ActionCableController;
   var dataStream = null;
   var methods;

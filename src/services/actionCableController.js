@@ -1,5 +1,4 @@
-angular.module('ngActionCable')
-  .factory('ActionCableController', ['$rootScope', 'ActionCableConfig', ActionCableController]);
+ngActionCable.factory('ActionCableController', ['$rootScope', 'ActionCableConfig', ActionCableController]);
 
 function ActionCableController($rootScope, ActionCableConfig) {
 

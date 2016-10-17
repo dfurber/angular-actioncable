@@ -1,1 +1,3 @@
-angular.module('ngActionCable', ['ngWebsocket']);
+'use strict';
+
+var ngActionCable = angular.module('ngActionCable', ['ngWebsocket']);
