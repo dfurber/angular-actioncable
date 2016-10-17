@@ -2,87 +2,91 @@
 
 var ngActionCable = angular.module('ngActionCable', ['ngWebsocket']);
 
-ngActionCable.factory('ActionCableChannel', ['$q', '$rootScope', 'ActionCableController', 'ActionCableWebsocket', 'ActionCableConfig', 'ActionCableSocketWrangler', ActionCableChannel]);
+(function() {
+  'use strict';
 
-function ActionCableChannel($q, $rootScope, ActionCableController, ActionCableWebsocket, ActionCableConfig, ActionCableSocketWrangler){
-  return function(channelName, channelParams){
-    this._websocketControllerActions = function() {
-      ActionCableController.actions[this.channelName]= ActionCableController.actions[this.channelName] || {};
-      ActionCableController.actions[this.channelName][this._channelParamsString]= ActionCableController.actions[this.channelName][this._channelParamsString] || [];
-      return ActionCableController.actions[this.channelName][this._channelParamsString];
-    };
+  ngActionCable.factory('ActionCableChannel', ['$q', '$rootScope', 'ActionCableController', 'ActionCableWebsocket', 'ActionCableConfig', 'ActionCableSocketWrangler', ActionCableChannel]);
 
-    this._subscriptionCount= function(){
-      return this.callbacks.length;
-    };
+  function ActionCableChannel($q, $rootScope, ActionCableController, ActionCableWebsocket, ActionCableConfig, ActionCableSocketWrangler){
+    return function(channelName, channelParams){
+      this._websocketControllerActions = function() {
+        ActionCableController.actions[this.channelName]= ActionCableController.actions[this.channelName] || {};
+        ActionCableController.actions[this.channelName][this._channelParamsString]= ActionCableController.actions[this.channelName][this._channelParamsString] || [];
+        return ActionCableController.actions[this.channelName][this._channelParamsString];
+      };
 
-    this.channelName= channelName;
-    this.channelParams= channelParams || {};
-    this._channelParamsString= JSON.stringify(this.channelParams);
-    this.onMessageCallback= null;
-    this.callbacks= this._websocketControllerActions();
+      this._subscriptionCount= function(){
+        return this.callbacks.length;
+      };
 
-    this.subscribe = function(cb){
-      var request;
+      this.channelName= channelName;
+      this.channelParams= channelParams || {};
+      this._channelParamsString= JSON.stringify(this.channelParams);
+      this.onMessageCallback= null;
+      this.callbacks= this._websocketControllerActions();
 
-      if (typeof(cb) !== 'function') {
-        console.error("0x01 Callback function was not defined on subscribe(). ActionCable channel: '"+this.channelName+"', params: '"+this._channelParamsString+"'");
-        return $q.reject();
-      }
+      this.subscribe = function(cb){
+        var request;
 
-      if (this.onMessageCallback) {
-        console.error("0x02 This ActionCableChannel instance is already subscribed. ActionCable channel: '"+this.channelName+"', params: '"+this._channelParamsString+"'");
-        return $q.reject();
-      }
-
-      if (this._subscriptionCount() === 0) {
-        request = ActionCableWebsocket.subscribe(this.channelName, this.channelParams);
-      }
-
-      this._addMessageCallback(cb);
-
-      return (request || $q.resolve());
-    };
-
-    this.unsubscribe = function(){
-      var request;
-      this._removeMessageCallback();
-      if (this._subscriptionCount() === 0) { request= ActionCableWebsocket.unsubscribe(this.channelName, this.channelParams); }
-      return (request || $q.resolve());
-    };
-
-    this.send = function(message, action){
-      if (!this.onMessageCallback) {
-        console.error("0x03 You need to subscribe before you can send a message. ActionCable channel: '"+this.channelName+"', params: '"+this._channelParamsString+"'");
-        return $q.reject();
-      }
-      return ActionCableWebsocket.send(this.channelName, this.channelParams, message, action);
-    };
-
-    this.onConfirmSubscription = function(callback) {
-      if (ActionCableConfig.debug) { console.log('Callback', 'confirm_subscription:' +  this.channelName); }
-      $rootScope.$on('confirm_subscription:' +  this.channelName, callback);
-    };
-
-    this._addMessageCallback= function(cb){
-      this.onMessageCallback= cb;
-      this.callbacks.push(this.onMessageCallback);
-    };
-
-    this._removeMessageCallback= function(){
-      for(var i=0; i<this.callbacks.length; i++){
-        if (this.callbacks[i]===this.onMessageCallback) {
-          this.callbacks.splice(i, 1);
-          this.onMessageCallback= null;
-          return true;
+        if (typeof(cb) !== 'function') {
+          console.error("0x01 Callback function was not defined on subscribe(). ActionCable channel: '"+this.channelName+"', params: '"+this._channelParamsString+"'");
+          return $q.reject();
         }
-      }
-      if (ActionCableConfig.debug) { console.log("Callbacks:"); console.log(this.callbacks); }
-      if (ActionCableConfig.debug) { console.log("onMessageCallback:"); console.log(this.onMessageCallback); }
-      throw "Can't find onMessageCallback in callbacks array to remove";
+
+        if (this.onMessageCallback) {
+          console.error("0x02 This ActionCableChannel instance is already subscribed. ActionCable channel: '"+this.channelName+"', params: '"+this._channelParamsString+"'");
+          return $q.reject();
+        }
+
+        if (this._subscriptionCount() === 0) {
+          request = ActionCableWebsocket.subscribe(this.channelName, this.channelParams);
+        }
+
+        this._addMessageCallback(cb);
+
+        return (request || $q.resolve());
+      };
+
+      this.unsubscribe = function(){
+        var request;
+        this._removeMessageCallback();
+        if (this._subscriptionCount() === 0) { request= ActionCableWebsocket.unsubscribe(this.channelName, this.channelParams); }
+        return (request || $q.resolve());
+      };
+
+      this.send = function(message, action){
+        if (!this.onMessageCallback) {
+          console.error("0x03 You need to subscribe before you can send a message. ActionCable channel: '"+this.channelName+"', params: '"+this._channelParamsString+"'");
+          return $q.reject();
+        }
+        return ActionCableWebsocket.send(this.channelName, this.channelParams, message, action);
+      };
+
+      this.onConfirmSubscription = function(callback) {
+        if (ActionCableConfig.debug) { console.log('Callback', 'confirm_subscription:' +  this.channelName); }
+        $rootScope.$on('confirm_subscription:' +  this.channelName, callback);
+      };
+
+      this._addMessageCallback= function(cb){
+        this.onMessageCallback= cb;
+        this.callbacks.push(this.onMessageCallback);
+      };
+
+      this._removeMessageCallback= function(){
+        for(var i=0; i<this.callbacks.length; i++){
+          if (this.callbacks[i]===this.onMessageCallback) {
+            this.callbacks.splice(i, 1);
+            this.onMessageCallback= null;
+            return true;
+          }
+        }
+        if (ActionCableConfig.debug) { console.log("Callbacks:"); console.log(this.callbacks); }
+        if (ActionCableConfig.debug) { console.log("onMessageCallback:"); console.log(this.onMessageCallback); }
+        throw "Can't find onMessageCallback in callbacks array to remove";
+      };
     };
-  };
-}
+  }
+})();
 
 ngActionCable.factory('ActionCableConfig', function() {
   var defaultWsUri= 'wss://please.add.an.actioncable.meta.tag.invalid:12345/path/to/cable';
@@ -109,95 +113,100 @@ ngActionCable.factory('ActionCableConfig', function() {
   }
 });
 
-ngActionCable.factory('ActionCableController', ['$rootScope', 'ActionCableConfig', ActionCableController]);
+(function() {
+  'use strict';
 
-function ActionCableController($rootScope, ActionCableConfig) {
+  ngActionCable.factory('ActionCableController', ['$rootScope', 'ActionCableConfig', ActionCableController]);
 
-  // add a hash of callbacks here that `route_channel` will call on an incoming message.
-  // actions format: actions[channelName][dataParams] = [callback1, callback2, ...]
-  // e.g. actions["GlobalsData"][JSON.stringify({"responder_id":1})]= [function(message){...}, assignment_2: function(message){...}, ... ]
-  var actions = {
-    welcome: function(message){
-      if (ActionCableConfig.debug) {
-        console.log('Willkommen');
+  function ActionCableController($rootScope, ActionCableConfig) {
+
+    // add a hash of callbacks here that `route_channel` will call on an incoming message.
+    // actions format: actions[channelName][dataParams] = [callback1, callback2, ...]
+    // e.g. actions["GlobalsData"][JSON.stringify({"responder_id":1})]= [function(message){...}, assignment_2: function(message){...}, ... ]
+    var actions = {
+      welcome: function(message){
+        if (ActionCableConfig.debug) {
+          console.log('Willkommen');
+        }
+      },
+      ping: function(message){
+        if (ActionCableConfig.debug) {
+          console.log('ActionCable ping');
+        }
+      },
+
+      // Rails5.0.0.beta3 backport
+      _ping: function(message){
+        if (ActionCableConfig.debug) {
+          console.log('ActionCable 5.0.0.beta3 ping');
+        }
+      },
+      confirm_subscription: function(message) {
+        var identifier = JSON.parse(message.identifier);
+        var channel    = identifier.channel;
+
+        $rootScope.$broadcast('confirm_subscription:' +  channel);
+
+        if (ActionCableConfig.debug) {
+          console.log('ActionCable confirm_subscription on channel: ' + message.identifier);
+        }
+      },
+      ws_404: function(message){
+        if (ActionCableConfig.debug) {
+          console.log('ActionCable route not found: ' + message);
+        }
       }
-    },
-    ping: function(message){
-      if (ActionCableConfig.debug) {
-        console.log('ActionCable ping');
-      }
-    },
+    };
 
-    // Rails5.0.0.beta3 backport
-    _ping: function(message){
-      if (ActionCableConfig.debug) {
-        console.log('ActionCable 5.0.0.beta3 ping');
-      }
-    },
-    confirm_subscription: function(message) {
-      var identifier = JSON.parse(message.identifier);
-      var channel    = identifier.channel;
+    var routeToActions= function(actionCallbacks, message){
+      angular.forEach(actionCallbacks, function(func, id){
+        func.apply(null, [message]);
+      });
+    };
 
-      $rootScope.$broadcast('confirm_subscription:' +  channel);
-
-      if (ActionCableConfig.debug) {
-        console.log('ActionCable confirm_subscription on channel: ' + message.identifier);
+    var route = function(message){
+      if (!!actions[message.type]) {
+        actions[message.type](message);
+        if (message.type == 'ping') methods.after_ping_callback();
+      } else if (message.identifier == '_ping') {     // Rails5.0.0.beta3 backport
+        actions._ping(message);                       // Rails5.0.0.beta3 backport
+        methods.after_ping_callback();                // Rails5.0.0.beta3 backport
+      } else if (!!findActionCallbacksForChannel(channel_from(message), params_from(message))) {
+        var actionCallbacks= findActionCallbacksForChannel(channel_from(message), params_from(message));
+        routeToActions(actionCallbacks, message.message);
+      } else {
+        actions.ws_404(message);
       }
-    },
-    ws_404: function(message){
-      if (ActionCableConfig.debug) {
-        console.log('ActionCable route not found: ' + message);
+    };
+
+
+    function findActionCallbacksForChannel(channelName, params){
+      return (actions[channelName] && actions[channelName][params]);
+    }
+
+    function channel_from(message){
+      if (message && message.identifier) {
+        return JSON.parse(message.identifier).channel;
       }
     }
-  };
 
-  var routeToActions= function(actionCallbacks, message){
-    angular.forEach(actionCallbacks, function(func, id){
-      func.apply(null, [message]);
-    });
-  };
-
-  var route = function(message){
-    if (!!actions[message.type]) {
-      actions[message.type](message);
-      if (message.type == 'ping') methods.after_ping_callback();
-    } else if (message.identifier == '_ping') {     // Rails5.0.0.beta3 backport
-      actions._ping(message);                       // Rails5.0.0.beta3 backport
-      methods.after_ping_callback();                // Rails5.0.0.beta3 backport
-    } else if (!!findActionCallbacksForChannel(channel_from(message), params_from(message))) {
-      var actionCallbacks= findActionCallbacksForChannel(channel_from(message), params_from(message));
-      routeToActions(actionCallbacks, message.message);
-    } else {
-      actions.ws_404(message);
+    function params_from(message){
+      var paramsData= JSON.parse(message.identifier).data;
+      return JSON.stringify(paramsData);
     }
-  };
 
+    var methods = {
+      post: function(message){
+        return route(message);
+      },
+      actions: actions,
+      after_ping_callback: function(){}
+    };
 
-  function findActionCallbacksForChannel(channelName, params){
-    return (actions[channelName] && actions[channelName][params]);
+    return methods;
   }
 
-  function channel_from(message){
-    if (message && message.identifier) {
-      return JSON.parse(message.identifier).channel;
-    }
-  }
-
-  function params_from(message){
-    var paramsData= JSON.parse(message.identifier).data;
-    return JSON.stringify(paramsData);
-  }
-
-  var methods = {
-    post: function(message){
-      return route(message);
-    },
-    actions: actions,
-    after_ping_callback: function(){}
-  };
-
-  return methods;
-}
+})();
 
 ngActionCable.factory('ActionCableSocketWrangler', ['$rootScope', 'ActionCableWebsocket', 'ActionCableConfig', 'ActionCableController',
 function($rootScope, ActionCableWebsocket, ActionCableConfig, ActionCableController) {
