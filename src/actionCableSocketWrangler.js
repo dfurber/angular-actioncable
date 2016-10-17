@@ -1,13 +1,4 @@
-'use strict';
-
-// ngActionCableSocketWrangler to start, stop or try reconnect websockets if they die.
-//
-// Current status is denoted by three booleans:
-// connected(), connecting(), and disconnected(), in an abstraction
-// of the internal trivalent logic. Exactly one will be true at all times.
-//
-// Actions are start() and stop()
-angular.module('ngActionCable').factory('ActionCableSocketWrangler', ['$rootScope', 'ActionCableWebsocket', 'ActionCableConfig', 'ActionCableController',
+angular.module('ngActionCable', ['ngWebSocket']).factory('ActionCableSocketWrangler', ['$rootScope', 'ActionCableWebsocket', 'ActionCableConfig', 'ActionCableController',
 function($rootScope, ActionCableWebsocket, ActionCableConfig, ActionCableController) {
   var reconnectIntervalTime= 7537;
   var timeoutTime= 20143;

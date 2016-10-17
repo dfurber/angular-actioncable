@@ -1,4 +1,4 @@
-angular.module('ngActionCable')
+angular.module('ngActionCable', ['ngWebSocket'])
   .factory('ActionCableController', ['$rootScope', 'ActionCableConfig', ActionCableController]);
 
 function ActionCableController($rootScope, ActionCableConfig) {
