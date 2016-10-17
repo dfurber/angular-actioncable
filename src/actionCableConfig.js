@@ -1,4 +1,4 @@
-angular.module('ngActionCable', ['ngWebSocket']).factory('ActionCableConfig', function() {
+const ActionCableConfig = function() {
   var defaultWsUri= 'wss://please.add.an.actioncable.meta.tag.invalid:12345/path/to/cable';
   var _wsUri;
   var config= {
@@ -21,4 +21,6 @@ angular.module('ngActionCable', ['ngWebSocket']).factory('ActionCableConfig', fu
   function actioncable_meta_tag_content() {
     return _wsUri;
   }
-});
+};
+
+export default ActionCableConfig;

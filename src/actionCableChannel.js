@@ -1,7 +1,5 @@
-angular.module('ngActionCable', ['ngWebSocket'])
-  .factory('ActionCableChannel', ['$q', '$rootScope', 'ActionCableController', 'ActionCableWebsocket', 'ActionCableConfig', 'ActionCableSocketWrangler', ActionCableChannel]);
-
-function ActionCableChannel($q, $rootScope, ActionCableController, ActionCableWebsocket, ActionCableConfig, ActionCableSocketWrangler){
+/*@ngInject;*/
+const ActionCableChannel = function($q, $rootScope, ActionCableController, ActionCableWebsocket, ActionCableConfig, ActionCableSocketWrangler){
   return function(channelName, channelParams){
     this._websocketControllerActions = function() {
       ActionCableController.actions[this.channelName]= ActionCableController.actions[this.channelName] || {};
@@ -80,3 +78,5 @@ function ActionCableChannel($q, $rootScope, ActionCableController, ActionCableWe
     };
   };
 }
+
+export default ActionCableChannel;
