@@ -5,7 +5,8 @@ var ngActionCable = angular.module('ngActionCable', ['ngWebsocket']);
 (function() {
   'use strict';
 
-  ngActionCable.factory('ActionCableChannel', ['$q', '$rootScope', 'ActionCableController', 'ActionCableWebsocket', 'ActionCableConfig', 'ActionCableSocketWrangler', ActionCableChannel]);
+  angular.module('ngActionCable')
+    .factory('ActionCableChannel', ['$q', '$rootScope', 'ActionCableController', 'ActionCableWebsocket', 'ActionCableConfig', 'ActionCableSocketWrangler', ActionCableChannel]);
 
   function ActionCableChannel($q, $rootScope, ActionCableController, ActionCableWebsocket, ActionCableConfig, ActionCableSocketWrangler){
     return function(channelName, channelParams){
@@ -88,6 +89,11 @@ var ngActionCable = angular.module('ngActionCable', ['ngWebsocket']);
   }
 })();
 
+'use strict';
+
+// default websocket configs
+// looks for Rails' <%= action_cable_meta_tag %> in this format:
+// <meta name="action-cable-url" content="ws://localhost:3000/cable"/>
 ngActionCable.factory('ActionCableConfig', function() {
   var defaultWsUri= 'wss://please.add.an.actioncable.meta.tag.invalid:12345/path/to/cable';
   var _wsUri;
@@ -95,28 +101,37 @@ ngActionCable.factory('ActionCableConfig', function() {
     autoStart: false,
     debug: true
   };
-
   Object.defineProperty(config, 'wsUri', {
     get: function () {
       _wsUri= _wsUri || actioncable_meta_tag_content() ||  defaultWsUri;
       return _wsUri;
     },
     set: function(newWsUri) {
-      // devlog(`Setting new wsUri! ${newWsUri}`);
       _wsUri= newWsUri;
       return _wsUri;
     }
   });
   return config;
   function actioncable_meta_tag_content() {
-    return _wsUri;
+    var metaTags= document.getElementsByTagName('meta');
+    var metaTagContent= false;
+    for (var index = 0; index < metaTags.length; index++) {
+      if (metaTags[index].hasAttribute('name') && metaTags[index].hasAttribute('content')) {
+        if (metaTags[index].getAttribute('name')=== 'action-cable-url' ){
+          metaTagContent= metaTags[index].getAttribute('content');
+          break;
+        }
+      }
+    }
+    return metaTagContent;
   }
 });
 
 (function() {
   'use strict';
 
-  ngActionCable.factory('ActionCableController', ['$rootScope', 'ActionCableConfig', ActionCableController]);
+  angular.module('ngActionCable')
+    .factory('ActionCableController', ['$rootScope', 'ActionCableConfig', ActionCableController]);
 
   function ActionCableController($rootScope, ActionCableConfig) {
 
@@ -208,6 +223,15 @@ ngActionCable.factory('ActionCableConfig', function() {
 
 })();
 
+'use strict';
+
+// ngActionCableSocketWrangler to start, stop or try reconnect websockets if they die.
+//
+// Current status is denoted by three booleans:
+// connected(), connecting(), and disconnected(), in an abstraction
+// of the internal trivalent logic. Exactly one will be true at all times.
+//
+// Actions are start() and stop()
 ngActionCable.factory('ActionCableSocketWrangler', ['$rootScope', 'ActionCableWebsocket', 'ActionCableConfig', 'ActionCableController',
 function($rootScope, ActionCableWebsocket, ActionCableConfig, ActionCableController) {
   var reconnectIntervalTime= 7537;
@@ -296,6 +320,33 @@ function($rootScope, ActionCableWebsocket, ActionCableConfig, ActionCableControl
   if (ActionCableConfig.autoStart) methods.start();
   return methods;
 }]);
+
+'use strict';
+
+// ActionCable JSON formats:
+//
+// "identifier" for subscribe, unsubscribe and message must be the same to refer the same subscription!
+//
+// {
+//   "command": "subscribe",
+//   "identifier": JSON.stringify({"channel": "UpdatesChannel",  "data": "name"}),
+// }
+//  - will set params to ["identifier"]["data"]
+//
+// {
+//   "command": "unsubscribe",
+//   "identifier": JSON.stringify({"channel": "UpdatesChannel",  "data": "name"}),
+// }
+//  - will set params to ["identifier"]["data"]
+//
+// {
+//   "command": "message",
+//   "identifier": JSON.stringify({"channel": "UpdatesChannel",  "data": "name"}),
+//   "data": JSON.stringify({"message": "bla bla", "action": "foobar"})
+// }
+//  - will call foobar(data)
+//  - will set params to ["identifier"]["data"]
+
 
 ngActionCable.factory("ActionCableWebsocket", ['$websocket', 'ActionCableController', 'ActionCableConfig', function($websocket, ActionCableController, ActionCableConfig) {
   var controller = ActionCableController;

@@ -1,7 +1,8 @@
 (function() {
   'use strict';
 
-  ngActionCable.factory('ActionCableController', ['$rootScope', 'ActionCableConfig', ActionCableController]);
+  angular.module('ngActionCable')
+    .factory('ActionCableController', ['$rootScope', 'ActionCableConfig', ActionCableController]);
 
   function ActionCableController($rootScope, ActionCableConfig) {
 

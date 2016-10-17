@@ -1,7 +1,8 @@
 (function() {
   'use strict';
 
-  ngActionCable.factory('ActionCableChannel', ['$q', '$rootScope', 'ActionCableController', 'ActionCableWebsocket', 'ActionCableConfig', 'ActionCableSocketWrangler', ActionCableChannel]);
+  angular.module('ngActionCable')
+    .factory('ActionCableChannel', ['$q', '$rootScope', 'ActionCableController', 'ActionCableWebsocket', 'ActionCableConfig', 'ActionCableSocketWrangler', ActionCableChannel]);
 
   function ActionCableChannel($q, $rootScope, ActionCableController, ActionCableWebsocket, ActionCableConfig, ActionCableSocketWrangler){
     return function(channelName, channelParams){

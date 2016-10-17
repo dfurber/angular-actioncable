@@ -1,3 +1,30 @@
+'use strict';
+
+// ActionCable JSON formats:
+//
+// "identifier" for subscribe, unsubscribe and message must be the same to refer the same subscription!
+//
+// {
+//   "command": "subscribe",
+//   "identifier": JSON.stringify({"channel": "UpdatesChannel",  "data": "name"}),
+// }
+//  - will set params to ["identifier"]["data"]
+//
+// {
+//   "command": "unsubscribe",
+//   "identifier": JSON.stringify({"channel": "UpdatesChannel",  "data": "name"}),
+// }
+//  - will set params to ["identifier"]["data"]
+//
+// {
+//   "command": "message",
+//   "identifier": JSON.stringify({"channel": "UpdatesChannel",  "data": "name"}),
+//   "data": JSON.stringify({"message": "bla bla", "action": "foobar"})
+// }
+//  - will call foobar(data)
+//  - will set params to ["identifier"]["data"]
+
+
 ngActionCable.factory("ActionCableWebsocket", ['$websocket', 'ActionCableController', 'ActionCableConfig', function($websocket, ActionCableController, ActionCableConfig) {
   var controller = ActionCableController;
   var dataStream = null;
